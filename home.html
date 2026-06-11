@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}カピバラチューブ{% endblock %}
+
+{% block extra_style %}
+#home-wrap {
+  min-height: calc(100vh - 56px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px;
+}
+#home-logo {
+  font-size: clamp(2.5em, 8vw, 4.5em);
+  font-weight: 900;
+  background: linear-gradient(90deg,#ff0000,#ff7700,#ffee00,#00cc44,#0088ff,#aa00ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  text-align: center; margin-bottom: 8px;
+  animation: fadeUp 0.7s ease;
+  cursor: pointer;
+}
+@keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+#home-sub { color: var(--text2); font-size: 14px; text-align: center; margin-bottom: 36px; }
+
+.home-search-wrap {
+  position: relative; width: 100%; max-width: 640px;
+  animation: fadeUp 0.7s ease 0.1s both;
+}
+.home-search-wrap input {
+  width: 100%; padding: 16px 56px 16px 24px;
+  background: var(--bg2); border: 2px solid var(--border);
+  border-radius: 32px; outline: none;
+  color: var(--text); font-size: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.home-search-wrap input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 10px 40px rgba(255,0,0,0.15);
+}
+.home-search-wrap button {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: var(--accent); border: none; border-radius: 50%;
+  width: 38px; height: 38px; color: #fff; font-size: 15px;
+  cursor: pointer; transition: background 0.2s;
+}
+.home-search-wrap button:hover { background: #cc0000; }
+
+.quick-links {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  justify-content: center; margin-top: 32px;
+  animation: fadeUp 0.7s ease 0.2s both;
+}
+.quick-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; background: var(--bg2);
+  border: 1.5px solid var(--border); border-radius: 24px;
+  color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 600;
+  transition: all 0.2s;
+}
+.quick-btn:hover {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+  transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,0,0,0.25);
+}
+{% endblock %}
+
+{% block content %}
+<div id="home-wrap">
+  <div id="home-logo" onclick="location.href='/'">🐹 カピバラチューブ</div>
+  <p id="home-sub">Invidiousで広告なし・埋め込み禁止動画も再生</p>
+
+  <form class="home-search-wrap" action="/search" method="get">
+    <input name="q" type="search" placeholder="動画を検索..." autocomplete="off" autofocus spellcheck="false">
+    <button type="submit"><i class="fas fa-search"></i></button>
+  </form>
+
+  <div class="quick-links">
+    <a href="/search?q=急上昇&type=video" class="quick-btn"><i class="fas fa-fire" style="color:#ff6600"></i>急上昇</a>
+    <a href="/search?q=ライブ配信中&type=video" class="quick-btn"><i class="fas fa-circle" style="color:#ff0000"></i>ライブ</a>
+    <a href="/search?q=ショート&type=short" class="quick-btn"><i class="fas fa-mobile-alt" style="color:#00aaff"></i>ショート</a>
+    <a href="/history" class="quick-btn"><i class="fas fa-history" style="color:#aaa"></i>履歴</a>
+    <a href="/status" class="quick-btn"><i class="fas fa-chart-line" style="color:#00cc44"></i>稼働状況</a>
+  </div>
+</div>
+{% endblock %}

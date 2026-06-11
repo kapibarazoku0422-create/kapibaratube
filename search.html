@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}{{ query }} - カピバラチューブ{% endblock %}
+
+{% block extra_style %}
+#search-page { padding: 16px; }
+
+/* タブ */
+.type-tabs {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.type-tab {
+  padding: 7px 16px; border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: transparent; color: var(--text2);
+  font-size: 13px; cursor: pointer; text-decoration: none;
+  transition: all var(--trans); white-space: nowrap;
+}
+.type-tab:hover { background: var(--bg3); color: var(--text); }
+.type-tab.active { background: #fff; border-color: #fff; color: #000; font-weight: 700; }
+
+/* グリッド */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+.results-grid.short-grid {
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 12px;
+}
+
+/* 動画カード */
+.vcard { cursor: pointer; border-radius: var(--r); overflow: hidden; text-decoration: none; display: block; }
+.vcard:hover .vthumb img { transform: scale(1.05); }
+.vthumb { position: relative; aspect-ratio: 16/9; overflow: hidden; background: #111; border-radius: var(--r); }
+.vthumb.short { aspect-ratio: 9/16; }
+.vthumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+.vdur {
+  position: absolute; bottom: 5px; right: 6px;
+  background: rgba(0,0,0,0.85); color: #fff;
+  font-size: 11px; font-weight: 600; padding: 2px 5px; border-radius: 4px;
+}
+.vlive {
+  position: absolute; top: 6px; left: 6px;
+  background: #ff0000; color: #fff;
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 3px;
+}
+.vinfo { padding: 8px 4px 4px; }
+.vtitle {
+  font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 4px;
+}
+.vmeta { font-size: 12px; color: var(--text3); }
+
+/* チャンネルカード */
+.ch-card {
+  cursor: pointer; border-radius: var(--r); background: var(--bg2);
+  padding: 16px; text-align: center; text-decoration: none; display: block;
+  transition: background var(--trans);
+}
+.ch-card:hover { background: var(--bg3); }
+.ch-avatar { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px; display: block; border: 2px solid var(--border); }
+.ch-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.ch-sub { font-size: 11px; color: var(--text3); }
+
+/* ページネーション */
+.pager { display: flex; justify-content: center; gap: 10px; padding: 24px 0; }
+.page-btn {
+  padding: 8px 22px; background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 20px; color: var(--text); cursor: pointer; font-size: 13px;
+  text-decoration: none; transition: all var(--trans);
+}
+.page-btn:hover { background: #fff; color: #000; border-color: #fff; }
+.page-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+@media(max-width:600px) {
+  .results-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+}
+{% endblock %}
+
+{% block content %}
+<div id="search-page">
+  <div class="type-tabs">
+    <a href="/search?q={{ query }}&type=video"  class="type-tab {% if type == 'video' %}active{% endif %}">🎬 動画</a>
+    <a href="/search?q={{ query }}&type=short"  class="type-tab {% if type == 'short' %}active{% endif %}">📱 ショート</a>
+    <a href="/search?q={{ query }}&type=channel" class="type-tab {% if type == 'channel' %}active{% endif %}">📺 チャンネル</a>
+    <a href="/search?q={{ query }}&type=playlist" class="type-tab {% if type == 'playlist' %}active{% endif %}">📋 プレイリスト</a>
+  </div>
+
+  {% if not results %}
+    <div style="text-align:center;padding:80px 0;color:var(--text2)">
+      <div style="font-size:48px;margin-bottom:12px">🐹</div>
+      <p>「{{ query }}」の検索結果が見つかりませんでした</p>
+    </div>
+  {% else %}
+
+  <div class="results-grid {% if type == 'short' %}short-grid{% endif %}">
+  {% for item in results %}
+
+    {# ===== 動画 ===== #}
+    {% if item.type == 'video' or (item.videoId and item.type != 'channel' and item.type != 'playlist') %}
+      {% set thumb = item.videoThumbnails[2].url if item.videoThumbnails and item.videoThumbnails|length > 2 else (item.videoThumbnails[0].url if item.videoThumbnails else '') %}
+      {% set mins = (item.lengthSeconds // 60) if item.lengthSeconds else 0 %}
+      {% set secs = (item.lengthSeconds % 60) if item.lengthSeconds else 0 %}
+      {% set is_short = (type == 'short') %}
+
+      <a class="vcard" href="{% if is_short %}/shorts/{{ item.videoId }}{% else %}/watch?v={{ item.videoId }}{% endif %}">
+        <div class="vthumb {% if is_short %}short{% endif %}">
+          <img src="{{ thumb }}" loading="lazy" alt="{{ item.title }}">
+          {% if item.lengthSeconds and item.lengthSeconds > 0 %}
+            <div class="vdur">{{ '%d:%02d' % (mins, secs) if mins < 60 else '%d:%02d:%02d' % (mins//60, mins%60, secs) }}</div>
+          {% else %}
+            <div class="vlive">● LIVE</div>
+          {% endif %}
+        </div>
+        <div class="vinfo">
+          <div class="vtitle">{{ item.title }}</div>
+          <div class="vmeta">{{ item.author }} {% if item.viewCountText %}・{{ item.viewCountText }}{% endif %} {% if item.publishedText %}・{{ item.publishedText }}{% endif %}</div>
+        </div>
+      </a>
+
+    {# ===== チャンネル ===== #}
+    {% elif item.type == 'channel' %}
+      {% set avatar = item.authorThumbnails[-1].url if item.authorThumbnails else '' %}
+      <a class="ch-card" href="/channel/{{ item.authorId }}">
+        <img class="ch-avatar" src="{{ avatar }}" loading="lazy" alt="{{ item.author }}">
+        <div class="ch-name">{{ item.author }}</div>
+        <div class="ch-sub">{% if item.subCountText %}登録者 {{ item.subCountText }}{% endif %}</div>
+      </a>
+
+    {# ===== プレイリスト ===== #}
+    {% elif item.type == 'playlist' %}
+      {% set thumb = item.videoThumbnails[0].url if item.videoThumbnails else '' %}
+      <a class="vcard" href="/playlist?list={{ item.playlistId }}">
+        <div class="vthumb" style="background:#222">
+          {% if thumb %}<img src="{{ thumb }}" loading="lazy" alt="{{ item.title }}">{% endif %}
+          <div class="vdur">📋 {{ item.videoCount }}本</div>
+        </div>
+        <div class="vinfo">
+          <div class="vtitle">{{ item.title }}</div>
+          <div class="vmeta">{{ item.author }}</div>
+        </div>
+      </a>
+    {% endif %}
+  {% endfor %}
+  </div>
+
+  <div class="pager">
+    {% if page > 1 %}
+      <a class="page-btn" href="/search?q={{ query }}&type={{ type }}&page={{ page - 1 }}">◀ 前へ</a>
+    {% endif %}
+    <a class="page-btn" href="/search?q={{ query }}&type={{ type }}&page={{ page + 1 }}">次へ ▶</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

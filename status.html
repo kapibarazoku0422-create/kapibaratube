@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}稼働状況 - カピバラチューブ{% endblock %}
+{% block extra_style %}
+#status-page { padding: 24px 20px; max-width: 800px; margin: 0 auto; }
+#status-page h1 { font-size: 20px; margin-bottom: 20px; }
+.inst-card {
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.inst-url { font-size: 13px; font-weight: 600; flex: 1; word-break: break-all; color: var(--text); }
+.inst-status { font-size: 13px; font-weight: 700; }
+.inst-latency { font-size: 12px; color: var(--text3); background: var(--bg3); padding: 3px 10px; border-radius: 20px; }
+{% endblock %}
+{% block content %}
+<div id="status-page">
+  <h1>📡 Invidiousインスタンス稼働状況</h1>
+  {% for inst in instances %}
+  <div class="inst-card">
+    <div class="inst-url"><a href="{{ inst.instance }}" target="_blank" style="color:var(--text);text-decoration:none">{{ inst.instance }}</a></div>
+    <div class="inst-status">{{ inst.status }}</div>
+    <div class="inst-latency">{{ inst.latency }}</div>
+    {% if inst.version != '-' %}<div style="font-size:11px;color:var(--text3)">v{{ inst.version }}</div>{% endif %}
+  </div>
+  {% endfor %}
+  <p style="font-size:12px;color:var(--text3);margin-top:16px">動画が再生できない場合は別のインスタンスに自動切り替えされます</p>
+</div>
+{% endblock %}

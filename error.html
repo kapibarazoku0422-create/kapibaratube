@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}エラー - カピバラチューブ{% endblock %}
+{% block content %}
+<div style="text-align:center;padding:80px 20px;color:var(--text2)">
+  <div style="font-size:60px;margin-bottom:16px">🐹</div>
+  <h2 style="font-size:18px;margin-bottom:10px;color:var(--text)">エラーが発生しました</h2>
+  <p style="font-size:14px;margin-bottom:24px">{{ msg or 'しばらく待ってからリロードしてね' }}</p>
+  <a href="/" style="display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:var(--accent);border-radius:20px;color:#fff;text-decoration:none;font-size:13px;font-weight:700">
+    <i class="fas fa-home"></i> ホームへ戻る
+  </a>
+</div>
+{% endblock %}

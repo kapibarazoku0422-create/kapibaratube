@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ video_title }} - カピバラチューブ{% endblock %}
+
+{% block extra_style %}
+#short-wrap {
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 20px 16px; gap: 20px; flex-wrap: wrap;
+}
+#short-player-col {
+  width: 100%; max-width: 380px;
+}
+#short-video-wrap {
+  position: relative; aspect-ratio: 9/16;
+  background: #000; border-radius: 12px; overflow: hidden;
+}
+#short-video-wrap video { width: 100%; height: 100%; object-fit: contain; }
+#short-info { margin-top: 12px; padding: 0 4px; }
+#short-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.short-meta { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+.yt-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; background: var(--accent); border-radius: 20px;
+  color: #fff; font-size: 12px; text-decoration: none; font-weight: 700;
+  transition: background 0.15s; margin-top: 10px;
+}
+.yt-link:hover { background: #cc0000; }
+
+#short-comments { max-width: 400px; width: 100%; }
+#short-comments h3 { font-size: 15px; margin-bottom: 14px; }
+.comment { display: flex; gap: 10px; margin-bottom: 14px; }
+.comment-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: var(--bg3); flex-shrink: 0; }
+.comment-author { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.comment-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+{% endblock %}
+
+{% block content %}
+<div id="short-wrap">
+  <div id="short-player-col">
+    <div id="short-video-wrap">
+      <video id="short-video" controls autoplay playsinline loop>
+        {% for url in videourls %}
+          <source src="{{ url }}">
+        {% endfor %}
+      </video>
+    </div>
+    <div id="short-info">
+      <div id="short-title">{{ video_title }}</div>
+      <div class="short-meta">📺 <a href="/channel/{{ author_id }}" style="color:var(--text2);text-decoration:none">{{ author }}</a></div>
+      <div class="short-meta">👁 {{ '{:,}'.format(view_count) }} 回視聴　👍 {{ '{:,}'.format(like_count) }}</div>
+      <a class="yt-link" href="https://www.youtube.com/shorts/{{ videoid }}" target="_blank"><i class="fab fa-youtube"></i> YouTubeで開く</a>
+    </div>
+  </div>
+
+  {% if comments %}
+  <div id="short-comments">
+    <h3>💬 コメント</h3>
+    {% for c in comments[:20] %}
+    <div class="comment">
+      {% set avatar = c.authorThumbnails[-1].url if c.authorThumbnails else '' %}
+      <img class="comment-avatar" src="{{ avatar }}" loading="lazy" alt="{{ c.author }}">
+      <div>
+        <div class="comment-author">{{ c.author }}</div>
+        <div class="comment-text">{{ c.contentHtml | safe }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

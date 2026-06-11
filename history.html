@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}視聴履歴 - カピバラチューブ{% endblock %}
+{% block extra_style %}
+#history-page { padding: 20px; }
+#history-page h1 { font-size: 20px; margin-bottom: 16px; }
+.hist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.hist-card { text-decoration: none; display: block; border-radius: var(--r); background: var(--bg2); overflow: hidden; transition: background var(--trans); }
+.hist-card:hover { background: var(--bg3); }
+.hist-thumb { aspect-ratio: 16/9; background: #111; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 24px; }
+.hist-info { padding: 8px 10px; }
+.hist-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.hist-meta { font-size: 12px; color: var(--text3); }
+.clear-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; background: var(--bg3); border: 1.5px solid var(--border); border-radius: 20px; color: var(--text2); text-decoration: none; font-size: 13px; margin-bottom: 16px; transition: all var(--trans); }
+.clear-btn:hover { border-color: var(--accent); color: var(--accent); }
+{% endblock %}
+{% block content %}
+<div id="history-page">
+  <h1>📺 視聴履歴</h1>
+  {% if history %}
+    <a href="/history/clear" class="clear-btn" onclick="return confirm('履歴を全部消しますか？')"><i class="fas fa-trash"></i> 全削除</a>
+    <div class="hist-grid">
+      {% for item in history %}
+      <a class="hist-card" href="/watch?v={{ item.videoId }}">
+        <div class="hist-thumb">🎬</div>
+        <div class="hist-info">
+          <div class="hist-title">{{ item.title or '不明' }}</div>
+          <div class="hist-meta">{{ item.author or '' }} ・ {{ item.added_at or '' }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align:center;padding:80px 0;color:var(--text2)">
+      <div style="font-size:48px;margin-bottom:12px">🐹</div>
+      <p>まだ履歴がありません</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
